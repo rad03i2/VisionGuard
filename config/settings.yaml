@@ -1,0 +1,107 @@
+# ==============================================================================
+# VisionGuard Enterprise Configuration
+# ==============================================================================
+
+app:
+  name: "VisionGuard AI"
+  version: "1.0.0"
+  debug: false
+  log_level: "INFO"
+
+# Video Sources & Ingestion
+# Supports RTSP streams, USB Webcams, MP4 video files, or mock simulation
+cameras:
+  - id: "cam-entrance-01"
+    name: "Main Entrance Gate"
+    source: "0" # 0 for default webcam, or "rtsp://admin:pass@192.168.1.50:554/stream1"
+    fps: 30
+    resolution: [1280, 720]
+    reconnect_interval_sec: 5
+    enabled: true
+
+  - id: "cam-warehouse-02"
+    name: "Storage Restricted Area"
+    source: "demo/sample_warehouse.mp4"
+    fps: 25
+    resolution: [1280, 720]
+    reconnect_interval_sec: 5
+    enabled: false
+
+# AI Detection Engine (YOLOv8 / YOLOv11 / ONNX)
+detection:
+  model_path: "yolov8n.pt" # yolov8n.pt, yolov8s.pt, yolov11n.pt, etc.
+  device: "auto" # "cuda", "cpu", or "auto"
+  confidence_threshold: 0.45
+  iou_threshold: 0.45
+  target_classes:
+    - 0  # person
+    - 1  # bicycle
+    - 2  # car
+    - 3  # motorcycle
+    - 5  # bus
+    - 7  # truck
+    - 15 # cat / animal
+    - 16 # dog
+
+# Multi-Object Tracking Engine (ByteTrack / Kalman Filter)
+tracking:
+  tracker_type: "bytetrack"
+  track_high_thresh: 0.5
+  track_low_thresh: 0.1
+  new_track_thresh: 0.6
+  track_buffer: 30 # frames to keep lost tracks
+  match_thresh: 0.8
+  trajectory_length: 64 # history points to draw motion trails
+
+# Geofencing, Intrusion & Loitering Rules
+analytics:
+  intrusion_zones:
+    - id: "zone_restricted_01"
+      name: "Server Room Perimeter"
+      camera_id: "cam-entrance-01"
+      color: [0, 0, 255] # Red BGR
+      polygon:
+        - [200, 150]
+        - [600, 150]
+        - [650, 480]
+        - [150, 480]
+      alert_on_classes: ["person", "car"]
+      loitering_time_sec: 5 # Alert if detected in zone for > 5 seconds
+
+  tripwires:
+    - id: "line_entry_gate"
+      name: "Entrance Counter"
+      camera_id: "cam-entrance-01"
+      line_start: [100, 300]
+      line_end: [700, 300]
+      direction: "bidirectional" # "in", "out", or "bidirectional"
+
+# Alerting & Real-time Notifications
+alerts:
+  cooldown_sec: 10 # Avoid alert spamming for the same object
+  save_snapshots: true
+  snapshots_dir: "snapshots"
+  
+  telegram:
+    enabled: false
+    bot_token: "${TELEGRAM_BOT_TOKEN}"
+    chat_id: "${TELEGRAM_CHAT_ID}"
+  
+  webhook:
+    enabled: false
+    url: "${WEBHOOK_URL}" # Slack, Discord, or Custom REST endpoint
+  
+  smtp_email:
+    enabled: false
+    host: "smtp.gmail.com"
+    port: 587
+    user: "${SMTP_USER}"
+    password: "${SMTP_PASS}"
+    recipients: ["security@example.com"]
+
+# Web Dashboard & REST API
+server:
+  host: "0.0.0.0"
+  port: 8000
+  stream_fps: 25
+  enable_dashboard: true
