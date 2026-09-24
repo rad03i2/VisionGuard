@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="visionguard",
     version="1.0.0",
-    author="rad03i2",
-    description="Enterprise AI CCTV Surveillance, Real-time Object Tracking, and Intrusion Detection System",
+    author="Radwan Abdulhadi Ahmed",
+    description="Local computer-vision toolkit for camera ingestion, object detection, tracking, zones, alerts, and a web dashboard",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/rad03i2/VisionGuard",
@@ -15,16 +15,13 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "Intended Audience :: System Administrators",
-        "Topic :: Security",
-        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Multimedia :: Video",
         "Topic :: Scientific/Engineering :: Image Recognition",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
-        "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
     install_requires=[
@@ -38,9 +35,9 @@ setup(
         "requests>=2.31.0",
         "python-dotenv>=1.0.0",
     ],
-    entry_points={
-        "console_scripts": [
-            "visionguard=visionguard.cli:main",
-        ],
+    entry_points={"console_scripts": ["visionguard=visionguard.cli:main"]},
+    project_urls={
+        "Source": "https://github.com/rad03i2/VisionGuard",
+        "Issues": "https://github.com/rad03i2/VisionGuard/issues",
     },
 )
